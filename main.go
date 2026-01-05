@@ -3,7 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
-	"log"
+	"time"
 )
 
 var (
@@ -50,7 +50,9 @@ func (e *ElectricTruck) UnloadCargo() error {
 }
 
 func processTruck(truck Truck) error {
-	fmt.Printf("Processing truck %+v \n", truck)
+	fmt.Printf("Start processing truck: %+v \n", truck)
+	time.Sleep(time.Second)
+
 	if err := truck.LoadCargo(); err != nil {
 		return fmt.Errorf("error loading cargo: %w", err)
 	}
@@ -59,18 +61,32 @@ func processTruck(truck Truck) error {
 		return fmt.Errorf("error unloading cargo: %w", err)
 	}
 
+	fmt.Printf("Finished processing truck: %+v\n", truck)
+	return nil
+}
+
+func processFleet(trucks []Truck) error {
+	for _, t := range trucks {
+		go processTruck(t)
+	}
+
 	return nil
 }
 
 func main() {
-	t := NormalTruck{cargo: 0}
+	fleet := []Truck{
+		&NormalTruck{id: "NT1", cargo: 0},
+		&ElectricTruck{id: "ET1", cargo: 0, battery: 100},
+		&NormalTruck{id: "NT2", cargo: 0},
+		&ElectricTruck{id: "ET2", cargo: 0, battery: 100},
+	}
 
-	fillTruckCargo(&t)
-	var userId *int
+	// process all trucks concurrently
+	if err := processFleet(fleet); err != nil {
+		fmt.Printf("Error processing fleet %v\n:", err)
+		return
+	}
 
-	log.Println(userId)
-}
-
-func fillTruckCargo(t *NormalTruck) {
-	t.cargo = 100
+	time.Sleep(time.Second * 5)
+	fmt.Println("All trucks processed successfully!")
 }

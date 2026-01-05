@@ -21,12 +21,12 @@ type NormalTruck struct {
 	cargo int
 }
 
-func (t NormalTruck) LoadCargo() error {
+func (t *NormalTruck) LoadCargo() error {
 	t.cargo += 1
 	return nil
 }
 
-func (t NormalTruck) UnloadCargo() error {
+func (t *NormalTruck) UnloadCargo() error {
 	t.cargo = 0
 	return nil
 }
@@ -37,13 +37,13 @@ type ElectricTruck struct {
 	battery int
 }
 
-func (e ElectricTruck) LoadCargo() error {
+func (e *ElectricTruck) LoadCargo() error {
 	e.cargo += 1
-	e.battery -= 1
+	e.battery += -1
 	return nil
 }
 
-func (e ElectricTruck) UnloadCargo() error {
+func (e *ElectricTruck) UnloadCargo() error {
 	e.cargo = 0
 	e.battery += -1
 	return nil
@@ -63,12 +63,13 @@ func processTruck(truck Truck) error {
 }
 
 func main() {
+	truckId := 40
+	anotherVariable := &truckId
 
-	if err := processTruck(NormalTruck{id: "1"}); err != nil {
-		log.Fatalf("Error processing truck: %s", err)
-	}
+	log.Println(truckId)
+	log.Println(*anotherVariable)
 
-	if err := processTruck(ElectricTruck{id: "2"}); err != nil {
-		log.Fatalf("Error processing truck: %s", err)
-	}
+	truckId = 100
+	log.Println(*anotherVariable)
+
 }

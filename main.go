@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"sync"
-	"time"
 )
 
 var (
@@ -53,7 +52,6 @@ func (e *ElectricTruck) UnloadCargo() error {
 
 func processTruck(truck Truck) error {
 	fmt.Printf("Start processing truck: %+v \n", truck)
-	time.Sleep(time.Second)
 
 	if err := truck.LoadCargo(); err != nil {
 		return fmt.Errorf("error loading cargo: %w", err)

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"sync"
+	"time"
 )
 
 type contextKey string
@@ -58,9 +59,17 @@ func (e *ElectricTruck) UnloadCargo() error {
 func processTruck(ctx context.Context, truck Truck) error {
 	fmt.Printf("Start processing truck: %+v \n", truck)
 
-	// access the userId
-	userID := ctx.Value(UserIDKey)
-	log.Println(userID)
+	// context timeout
+	ctx, cancel := context.WithTimeout(ctx, 2*time.Second)
+	defer cancel()
+
+	delay := time.Second * 1
+	select {
+	case <-ctx.Done():
+		return ctx.Err()
+	case <-time.After(delay):
+		break
+	}
 
 	if err := truck.LoadCargo(); err != nil {
 		return fmt.Errorf("error loading cargo: %w", err)

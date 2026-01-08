@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"log"
 	"sync"
-	"time"
 )
 
 type contextKey string
@@ -60,16 +59,16 @@ func processTruck(ctx context.Context, truck Truck) error {
 	fmt.Printf("Start processing truck: %+v \n", truck)
 
 	// context timeout
-	ctx, cancel := context.WithTimeout(ctx, 2*time.Second)
-	defer cancel()
-
-	delay := time.Second * 1
-	select {
-	case <-ctx.Done():
-		return ctx.Err()
-	case <-time.After(delay):
-		break
-	}
+	//ctx, cancel := context.WithTimeout(ctx, 2*time.Second)
+	//defer cancel()
+	//
+	//delay := time.Second * 1
+	//select {
+	//case <-ctx.Done():
+	//	return ctx.Err()
+	//case <-time.After(delay):
+	//	break
+	//}
 
 	if err := truck.LoadCargo(); err != nil {
 		return fmt.Errorf("error loading cargo: %w", err)
@@ -85,19 +84,31 @@ func processTruck(ctx context.Context, truck Truck) error {
 
 func processFleet(ctx context.Context, trucks []Truck) error {
 	var wg sync.WaitGroup
+	errorsChan := make(chan error, len(trucks))
 
 	for _, t := range trucks {
 		wg.Add(1)
 
 		go func(t Truck) {
 			if err := processTruck(ctx, t); err != nil {
-				log.Println(err)
+				errorsChan <- err
 			}
 
 			wg.Done()
 		}(t)
 	}
 	wg.Wait()
+	close(errorsChan)
+
+	var errs []error
+	for err := range errorsChan {
+		log.Printf("Error processing truck: %+v\n", err)
+		errs = append(errs, err)
+	}
+
+	if len(errs) > 0 {
+		return fmt.Errorf("processing errors: %v", errs)
+	}
 
 	return nil
 }

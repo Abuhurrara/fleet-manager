@@ -10,7 +10,7 @@ import (
 
 type contextKey string
 
-var UserIDKey contextKey = "userID"
+var userIDKey contextKey = "userID"
 
 var (
 	ErrNotImplemented = errors.New("not implemented")
@@ -59,7 +59,7 @@ func processTruck(ctx context.Context, truck Truck) error {
 	fmt.Printf("Start processing truck: %+v \n", truck)
 
 	// context timeout
-	//ctx, cancel := context.WithTimeout(ctx, 2*time.Second)
+	//ctx, cancel := conteuserIDKeymeout(ctx, 2*time.Second)
 	//defer cancel()
 	//
 	//delay := time.Second * 1
@@ -107,7 +107,7 @@ func processFleet(ctx context.Context, trucks []Truck) error {
 	}
 
 	if len(errs) > 0 {
-		return fmt.Errorf("processing errors: %v", errs)
+		return fmt.Errorf("processing errorss: %v", errs)
 	}
 
 	return nil
@@ -115,7 +115,7 @@ func processFleet(ctx context.Context, trucks []Truck) error {
 
 func main() {
 	ctx := context.Background()
-	ctx = context.WithValue(ctx, UserIDKey, 42)
+	ctx = context.WithValue(ctx, userIDKeyUserIDKey, 42)
 
 	fleet := []Truck{
 		&NormalTruck{id: "NT1", cargo: 0},
